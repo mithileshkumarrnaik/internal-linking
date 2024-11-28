@@ -11,6 +11,26 @@ from rake_nltk import Rake
 import nltk
 nltk.download('stopwords')
 
+# Ensure NLTK data is available
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
+
+# Function to extract keywords using RAKE
+def extract_keywords_with_rake(text, num_keywords=10):
+    try:
+        rake = Rake()
+        rake.extract_keywords_from_text(text)
+        return ", ".join(rake.get_ranked_phrases()[:num_keywords])
+    except Exception as e:
+        return f"Error extracting keywords: {e}"
+
 # Helper Functions
 def fetch_sitemap_urls(sitemaps):
     urls = []
