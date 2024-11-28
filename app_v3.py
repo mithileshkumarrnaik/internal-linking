@@ -10,6 +10,7 @@ from nltk.corpus import stopwords
 from rake_nltk import Rake
 import nltk
 nltk.download('stopwords')
+nltk.download('punkt_tab')
 
 # Ensure NLTK data is available
 try:
