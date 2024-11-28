@@ -8,6 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import re
 from nltk.corpus import stopwords
 from rake_nltk import Rake
+nltk.download('stopwords')
 
 # Helper Functions
 def fetch_sitemap_urls(sitemaps):
