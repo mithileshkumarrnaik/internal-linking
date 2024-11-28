@@ -76,7 +76,6 @@ if __name__ == "__main__":
     else:
         print("No data scraped. Check the input file or URLs.")
 
-!pip install rake-nltk
 import nltk
 nltk.download('punkt_tab') # Download the punkt_tab data
 nltk.download('stopwords')
