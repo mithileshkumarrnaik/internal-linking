@@ -8,6 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import re
 from nltk.corpus import stopwords
 from rake_nltk import Rake
+import nltk
 nltk.download('stopwords')
 
 # Helper Functions
