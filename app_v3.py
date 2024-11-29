@@ -124,13 +124,22 @@ else:
             st.error("No URLs extracted. Check the sitemap format.")
 
 # Step 2: Scrape Blog Data
+def filter_pages(scraped_df):
+    """Exclude rows where the title starts with 'Page ...'."""
+    return scraped_df[~scraped_df['title'].str.startswith("Page", na=False)]
+
+# Step 2: Scrape Blog Data
 st.header("Step 2: Scrape Blog Data")
 if "urls" in st.session_state:
     if st.button("Scrape Blogs"):
         scraped_data = scrape_blog_data(st.session_state['urls'])
         scraped_df = pd.DataFrame(scraped_data)
+        
+        # Filter out pages with titles starting with 'Page ...'
+        scraped_df = filter_pages(scraped_df)
+        
         st.session_state['scraped_data'] = scraped_df
-        st.write("Scraped Blog Data")
+        st.write("Filtered Scraped Blog Data (Excluding Titles Starting with 'Page ...')")
         st.dataframe(scraped_df)
         scraped_df.to_csv("scraped_data.csv", index=False)
 else:
