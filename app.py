@@ -3,6 +3,8 @@ import pandas as pd
 from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
 from helpers.process import filter_pages, generate_keywords, suggest_internal_links
 from helpers.nltk_setup import ensure_nltk_data
+import nltk
+print(nltk.data.path)  # Confirm nltk_data is in the path
 
 # Ensure NLTK resources are available
 ensure_nltk_data()
