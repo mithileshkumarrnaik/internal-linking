@@ -10,6 +10,11 @@ from nltk.corpus import stopwords
 from rake_nltk import Rake
 import nltk
 
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
 # Ensure NLTK data is available
 def ensure_nltk_data():
     required_resources = ['tokenizers/punkt', 'corpora/stopwords']
