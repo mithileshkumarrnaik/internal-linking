@@ -9,17 +9,25 @@ import re
 from nltk.corpus import stopwords
 from rake_nltk import Rake
 import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
+import os
 
 # Ensure NLTK data is available
 def ensure_nltk_data():
-    required_resources = ['tokenizers/punkt', 'corpora/stopwords']
-    for resource in required_resources:
-        try:
-            nltk.data.find(resource)
-        except LookupError:
-            nltk.download(resource.split('/')[-1])
+    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")  # Local nltk_data folder
+    nltk.data.path.append(nltk_data_path)
+
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path)
+
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
+
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords', download_dir=nltk_data_path, quiet=True)
 
 ensure_nltk_data()
 
