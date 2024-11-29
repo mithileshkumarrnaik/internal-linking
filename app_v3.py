@@ -13,17 +13,18 @@ import os
 
 # Ensure NLTK data is available
 def ensure_nltk_data():
-    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")  # Local nltk_data folder
+    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")  # Custom nltk_data directory
     nltk.data.path.append(nltk_data_path)
 
+    # Create the directory if it doesn't exist
     if not os.path.exists(nltk_data_path):
         os.makedirs(nltk_data_path)
 
+    # Ensure punkt and stopwords are downloaded
     try:
         nltk.data.find('tokenizers/punkt')
     except LookupError:
         nltk.download('punkt', download_dir=nltk_data_path, quiet=True)
-
     try:
         nltk.data.find('corpora/stopwords')
     except LookupError:
@@ -63,8 +64,11 @@ def scrape_blog_data(urls):
 def generate_keywords(scraped_df):
     def extract_keywords_with_rake(text, num_keywords=10):
         rake = Rake()
-        rake.extract_keywords_from_text(str(text))
-        return ", ".join(rake.get_ranked_phrases()[:num_keywords])
+        try:
+            rake.extract_keywords_from_text(str(text))
+            return ", ".join(rake.get_ranked_phrases()[:num_keywords])
+        except Exception as e:
+            return f"Error: {e}"
 
     scraped_df['keywords'] = scraped_df['content'].apply(lambda x: extract_keywords_with_rake(x))
     return scraped_df
