@@ -5,10 +5,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 
+
 def extract_keywords_with_rake(text, num_keywords=10):
-    """
-    Extracts keywords from text using RAKE, gracefully handles missing or invalid text.
-    """
     rake = Rake()
     try:
         if not text or pd.isna(text):
@@ -18,24 +16,28 @@ def extract_keywords_with_rake(text, num_keywords=10):
     except Exception as e:
         return f"Error: {e}"
 
+
 def filter_pages(scraped_df):
-    """
-    Filters out pages with titles starting with 'Page ...'.
-    """
     return scraped_df[~scraped_df['title'].str.startswith("Page", na=False)]
 
+
 def preprocess_text(text):
-    """
-    Preprocesses text by removing stopwords and special characters.
-    """
     stop_words = set(stopwords.words('english')).union({'https', 'com', 'blog', 'www'})
     text = re.sub(r'\W+', ' ', str(text).lower())
     return " ".join(word for word in text.split() if word not in stop_words)
 
+
+def generate_keywords(scraped_df, num_keywords=10):
+    try:
+        if 'content' not in scraped_df.columns:
+            raise KeyError("The 'content' column is missing in the DataFrame.")
+        scraped_df['keywords'] = scraped_df['content'].apply(lambda x: extract_keywords_with_rake(x, num_keywords))
+        return scraped_df
+    except Exception as e:
+        raise ValueError(f"Error generating keywords: {e}")
+
+
 def suggest_internal_links(content, blog_data, title_weight=2, threshold=0.15):
-    """
-    Suggests internal links based on relevance.
-    """
     content_cleaned = preprocess_text(content)
     blog_data['processed_keywords'] = blog_data['keywords'].apply(preprocess_text)
     blog_data['processed_title'] = blog_data['title'].apply(preprocess_text)

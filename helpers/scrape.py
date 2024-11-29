@@ -2,6 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 
+
 def fetch_sitemap_urls(sitemaps):
     urls = []
     for sitemap in sitemaps:
@@ -11,6 +12,7 @@ def fetch_sitemap_urls(sitemaps):
         except Exception as e:
             print(f"Error with sitemap {sitemap}: {e}")
     return urls
+
 
 def scrape_blog_data(urls, word_limit=1000):
     def fetch_blog_data(url):
