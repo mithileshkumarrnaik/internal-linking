@@ -5,6 +5,8 @@ from helpers.process import filter_pages, generate_keywords, suggest_internal_li
 from helpers.nltk_setup import ensure_nltk_data
 import nltk
 print(nltk.data.path)  # Confirm nltk_data is in the path
+nltk.download('punkt', download_dir='./nltk_data')
+nltk.download('stopwords', download_dir='./nltk_data')
 
 # Ensure NLTK resources are available
 ensure_nltk_data()
