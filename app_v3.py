@@ -9,11 +9,8 @@ import re
 from nltk.corpus import stopwords
 from rake_nltk import Rake
 import nltk
-
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+nltk.download('punkt')
+nltk.download('stopwords')
 
 # Ensure NLTK data is available
 def ensure_nltk_data():
