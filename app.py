@@ -1,13 +1,12 @@
 import os
 import streamlit as st
 import pandas as pd
+from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
 from helpers.process import (
-    fetch_sitemap_urls,
     load_list,
     filter_external_links,
     extract_keywords_with_rake,
     suggest_internal_links,
-    scrape_blog_data
 )
 
 # Define paths for inclusion and exclusion lists
