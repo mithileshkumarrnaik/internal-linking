@@ -68,15 +68,31 @@ if "scraped_data" in st.session_state:
         st.session_state['scraped_data'] = scraped_df
         st.write("Updated Blog Data with Keywords")
         st.dataframe(scraped_df)
+        scraped_df.to_csv("updated_scraped_data.csv", index=False)
 else:
     st.warning("Please scrape blogs first!")
+
+# A Check for the keywords Column
+if "scraped_data" in st.session_state:
+    if "keywords" not in st.session_state['scraped_data'].columns:
+        st.error("Keywords not generated. Please generate keywords first!")
+        st.stop()
 
 # Step 4: Suggest Internal Links
 st.header("Step 4: Suggest Internal Links")
 if "scraped_data" in st.session_state:
+    # Ensure keywords are generated
+    if "keywords" not in st.session_state['scraped_data'].columns:
+        st.error("Keywords not generated. Please generate keywords first!")
+        st.stop()
+
+    # Enter new blog content
     blog_content = st.text_area("Enter New Blog Content")
     if st.button("Suggest Links"):
+        # Call suggest_internal_links
         suggestions = suggest_internal_links(blog_content, st.session_state['scraped_data'])
+
+        # Display suggestions
         if not suggestions.empty:
             st.write("Suggested Internal Links")
             st.dataframe(suggestions)
@@ -85,6 +101,8 @@ if "scraped_data" in st.session_state:
 else:
     st.warning("Please generate keywords first!")
 
+
+#Step 5: External Links
 st.header("Step 5: Filter External Links")
 
 if "scraped_data" in st.session_state:
