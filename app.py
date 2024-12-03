@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+from helpers.nltk_setup import setup_nltk_data
+# Ensure NLTK resources are available
+setup_nltk_data()
+
 from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
 from helpers.process import (
     load_list,
@@ -7,10 +11,6 @@ from helpers.process import (
     extract_keywords_with_rake,
     suggest_internal_links,
 )
-
-from helpers.nltk_setup import setup_nltk_data
-# Ensure NLTK resources are available
-setup_nltk_data()
 
 
 # Define paths for inclusion and exclusion lists
