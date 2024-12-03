@@ -7,6 +7,13 @@ from helpers.process import fetch_sitemap_urls, load_list, filter_external_links
 EXCLUSION_FILE = "exclusion_list.txt"
 INCLUSION_FILE = "inclusion_list.txt"
 
+# Predefined list of sitemaps
+SITEMAP_LINKS = [
+    "https://acviss.com/page-sitemap.xml",
+    "https://blog.acviss.com/sitemap-post.xml",
+    "https://blog.acviss.com/sitemap-home.xml",
+]
+
 # Load inclusion and exclusion lists
 try:
     exclusion_list = load_list(EXCLUSION_FILE)
@@ -20,38 +27,43 @@ except FileNotFoundError as e:
 st.title("Sitemap Scraper and Link Processor")
 st.header("Step 4: Sitemap Scraping and Link Filtering")
 
-sitemaps = st.text_area("Enter sitemap URLs (one per line)", height=100)
+# Display predefined sitemap links for selection
+selected_sitemaps = st.multiselect(
+    "Select one or more sitemaps to process:", SITEMAP_LINKS
+)
 
 if st.button("Scrape and Process URLs"):
-    # Fetch URLs from the sitemap
-    sitemap_list = sitemaps.strip().split("\n")
-    all_urls = fetch_sitemap_urls(sitemap_list)
-    
-    if not all_urls:
-        st.error("No URLs extracted from the sitemap. Check the sitemap format.")
+    if not selected_sitemaps:
+        st.error("Please select at least one sitemap to process.")
     else:
-        # Process URLs using inclusion and exclusion lists
-        filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
+        # Fetch URLs from the selected sitemaps
+        all_urls = fetch_sitemap_urls(selected_sitemaps)
+        
+        if not all_urls:
+            st.error("No URLs extracted from the selected sitemaps. Check the sitemap format.")
+        else:
+            # Process URLs using inclusion and exclusion lists
+            filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
 
-        # Calculate totals
-        total_urls = len(all_urls)
-        excluded_urls = len(filtered_links["excluded"])
-        included_urls = len(filtered_links["included"])
-        remaining_urls = len(filtered_links["filtered"])
+            # Calculate totals
+            total_urls = len(all_urls)
+            excluded_urls = len(filtered_links["excluded"])
+            included_urls = len(filtered_links["included"])
+            remaining_urls = len(filtered_links["filtered"])
 
-        # Display summary
-        st.subheader("URL Processing Summary")
-        st.write(f"**Total URLs Scraped:** {total_urls}")
-        st.write(f"**Excluded URLs:** {excluded_urls}")
-        st.write(f"**Included URLs:** {included_urls}")
-        st.write(f"**Remaining URLs:** {remaining_urls}")
+            # Display summary
+            st.subheader("URL Processing Summary")
+            st.write(f"**Total URLs Scraped:** {total_urls}")
+            st.write(f"**Excluded URLs:** {excluded_urls}")
+            st.write(f"**Included URLs:** {included_urls}")
+            st.write(f"**Remaining URLs:** {remaining_urls}")
 
-        # Display categorized URLs
-        st.subheader("Excluded URLs")
-        st.write(filtered_links["excluded"])
+            # Display categorized URLs
+            st.subheader("Excluded URLs")
+            st.write(filtered_links["excluded"])
 
-        st.subheader("Included URLs (Prioritized)")
-        st.write(filtered_links["included"])
+            st.subheader("Included URLs (Prioritized)")
+            st.write(filtered_links["included"])
 
-        st.subheader("Remaining URLs")
-        st.write(filtered_links["filtered"])
+            st.subheader("Remaining URLs")
+            st.write(filtered_links["filtered"])
