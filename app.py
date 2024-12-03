@@ -17,6 +17,7 @@ except FileNotFoundError as e:
     inclusion_list = []
 
 # Step 4: Sitemap Scraping and Link Filtering
+st.title("Sitemap Scraper and Link Processor")
 st.header("Step 4: Sitemap Scraping and Link Filtering")
 
 sitemaps = st.text_area("Enter sitemap URLs (one per line)", height=100)
