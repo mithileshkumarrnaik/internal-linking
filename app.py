@@ -8,6 +8,11 @@ from helpers.process import (
     suggest_internal_links,
 )
 
+from helpers.nltk_setup import setup_nltk_data
+# Ensure NLTK resources are available
+setup_nltk_data()
+
+
 # Define paths for inclusion and exclusion lists
 EXCLUSION_FILE = "exclusion_list.txt"
 INCLUSION_FILE = "inclusion_list.txt"
