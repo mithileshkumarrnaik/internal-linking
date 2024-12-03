@@ -1,49 +1,9 @@
-import requests
-import xml.etree.ElementTree as ET
-import pandas as pd
 from nltk.corpus import stopwords
 from rake_nltk import Rake
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from bs4 import BeautifulSoup
-
-
-def fetch_sitemap_urls(sitemaps):
-    """
-    Fetches and extracts URLs from a list of sitemap URLs.
-    """
-    urls = []
-    for sitemap in sitemaps:
-        try:
-            response = requests.get(sitemap, timeout=10)
-            response.raise_for_status()
-            root = ET.fromstring(response.content)
-            urls.extend(
-                url.text for url in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
-            )
-        except Exception as e:
-            print(f"Error processing sitemap {sitemap}: {e}")
-    return urls
-
-
-def scrape_blog_data(urls, word_limit=1000):
-    """
-    Scrapes blog content from a list of URLs.
-    """
-    def fetch_blog_content(url):
-        try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.content, 'html.parser')
-            title = soup.title.get_text(strip=True) if soup.title else "No Title"
-            content = soup.find('div', class_='main-content') or soup.find('article') or soup.find('section')
-            text = content.get_text(" ").strip() if content else "No Content"
-            return {"url": url, "title": title, "content": " ".join(text.split()[:word_limit])}
-        except Exception as e:
-            return {"url": url, "title": "Error", "content": f"Error fetching content: {e}"}
-
-    return [fetch_blog_content(url) for url in urls]
+import pandas as pd
 
 
 def load_list(file_path):
@@ -99,4 +59,13 @@ def suggest_internal_links(content, blog_data, title_weight=2, threshold=0.15):
     Suggests internal links based on relevance to the given content.
     """
     content_cleaned = preprocess_text(content)
-    blog_data["processed_keywords"] 
+    blog_data["processed_keywords"] = blog_data["keywords"].apply(preprocess_text)
+    blog_data["processed_title"] = blog_data["title"].apply(preprocess_text)
+    combined_data = blog_data["processed_keywords"] + " " + blog_data["processed_title"] * title_weight
+    vectorizer = TfidfVectorizer(max_features=5000, ngram_range=(1, 2), min_df=2, max_df=0.8)
+    vectors = vectorizer.fit_transform(combined_data.tolist() + [content_cleaned])
+    similarities = cosine_similarity(vectors[-1], vectors[:-1]).flatten()
+    blog_data["relevance"] = similarities
+    suggestions = blog_data[blog_data["relevance"] >= threshold].nlargest(10, "relevance")
+    suggestions["relevance (%)"] = (suggestions["relevance"] * 100).round(2)
+    return suggestions[["title", "url", "relevance (%)"]]
