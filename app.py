@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import pandas as pd
 from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
@@ -13,6 +12,13 @@ from helpers.process import (
 EXCLUSION_FILE = "exclusion_list.txt"
 INCLUSION_FILE = "inclusion_list.txt"
 
+# Predefined list of sitemaps
+SITEMAP_LINKS = [
+    "https://acviss.com/page-sitemap.xml",
+    "https://blog.acviss.com/sitemap-post.xml",
+    "https://blog.acviss.com/sitemap-home.xml",
+]
+
 # Load inclusion and exclusion lists
 try:
     exclusion_list = load_list(EXCLUSION_FILE)
@@ -22,48 +28,56 @@ except FileNotFoundError as e:
     exclusion_list = []
     inclusion_list = []
 
-# Step 1: Scrape URLs and Filter
+# Step 1: Select Sitemaps
 st.title("Content Scraper and Link Suggester")
 
-st.header("Step 1: Scrape URLs and Filter")
-sitemaps = st.text_area("Enter sitemap URLs (one per line)", height=100)
+st.header("Step 1: Select Sitemaps")
+selected_sitemaps = st.multiselect(
+    "Select one or more sitemaps to process:",
+    SITEMAP_LINKS,
+    default=SITEMAP_LINKS[:1],  # Optionally preselect the first sitemap
+)
 
-if st.button("Scrape URLs"):
-    sitemap_list = sitemaps.strip().split("\n")
-    all_urls = fetch_sitemap_urls(sitemap_list)
-    
-    if not all_urls:
-        st.error("No URLs extracted. Check sitemap format.")
+# Step 2: Scrape URLs and Filter
+if st.button("Scrape and Process URLs"):
+    if not selected_sitemaps:
+        st.error("Please select at least one sitemap to process.")
     else:
-        # Scrape content and extract keywords
-        scraped_data = scrape_blog_data(all_urls)
-        scraped_df = pd.DataFrame(scraped_data)
-        scraped_df["keywords"] = scraped_df["content"].apply(extract_keywords_with_rake)
+        # Scrape URLs from the selected sitemaps
+        all_urls = fetch_sitemap_urls(selected_sitemaps)
         
-        # Filter based on inclusion and exclusion lists
-        filtered_links = filter_external_links(scraped_df["url"].tolist(), exclusion_list, inclusion_list)
-        included_links = filtered_links["included"]
-        excluded_links = filtered_links["excluded"]
-        remaining_links = filtered_links["filtered"]
+        if not all_urls:
+            st.error("No URLs extracted. Check sitemap format.")
+        else:
+            # Scrape content and extract keywords
+            scraped_data = scrape_blog_data(all_urls)
+            scraped_df = pd.DataFrame(scraped_data)
+            scraped_df["keywords"] = scraped_df["content"].apply(extract_keywords_with_rake)
+            
+            # Filter based on inclusion and exclusion lists
+            filtered_links = filter_external_links(scraped_df["url"].tolist(), exclusion_list, inclusion_list)
+            included_links = filtered_links["included"]
+            excluded_links = filtered_links["excluded"]
+            remaining_links = filtered_links["filtered"]
 
-        # Display processed data
-        st.subheader("Scraped Data with Keywords")
-        st.dataframe(scraped_df)
+            # Display processed data
+            st.subheader("Scraped Data with Keywords")
+            st.dataframe(scraped_df)
 
-        st.subheader("URL Processing Summary")
-        st.write(f"**Total URLs Scraped:** {len(all_urls)}")
-        st.write(f"**Excluded URLs:** {len(excluded_links)}")
-        st.write(f"**Included URLs:** {len(included_links)}")
-        st.write(f"**Remaining URLs:** {len(remaining_links)}")
+            st.subheader("URL Processing Summary")
+            st.write(f"**Total URLs Scraped:** {len(all_urls)}")
+            st.write(f"**Excluded URLs:** {len(excluded_links)}")
+            st.write(f"**Included URLs:** {len(included_links)}")
+            st.write(f"**Remaining URLs:** {len(remaining_links)}")
 
-        # Store processed data in session state
-        st.session_state["scraped_data"] = scraped_df
+            # Store processed data in session state
+            st.session_state["scraped_data"] = scraped_df
 
-# Step 2: Enter New Blog Content
+# Step 3: Enter New Blog Content
 st.header("Step 2: Enter New Blog Content")
 new_blog_content = st.text_area("Paste the new blog content here.")
 
-# Step 3: Suggest URLs
+# Step 4: Suggest URLs
 if new_blog_content:
     st.header("Step 3: Suggest Relevant URLs")
     if "scraped_data" in st.session_state:
