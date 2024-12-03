@@ -88,18 +88,33 @@ else:
 st.header("Step 5: Filter External Links")
 
 if "scraped_data" in st.session_state:
-    # Extract all URLs from the scraped data
     all_links = st.session_state['scraped_data']['url'].tolist()
 
-    if st.button("Filter External Links"):
-        # Filter the links based on exclusion and inclusion lists
-        filtered_links = filter_external_links(all_links, exclusion_list, inclusion_list)
+    if not all_links:
+        st.error("No links found in the scraped data.")
+        print("No links found in `scraped_data`.")
 
-        # Display included links
+    if st.button("Filter External Links"):
+        # Debug inclusion and exclusion lists
+        print("Exclusion List:", exclusion_list)
+        print("Inclusion List:", inclusion_list)
+
+        if not exclusion_list:
+            st.error("Exclusion list is empty or not loaded.")
+            print("Exclusion List is empty.")
+
+        if not inclusion_list:
+            st.warning("Inclusion list is empty. Only excluding links.")
+            print("Inclusion List is empty.")
+
+        # Call filter_external_links and debug the result
+        filtered_links = filter_external_links(all_links, exclusion_list, inclusion_list)
+        print("Filtered Links Result:", filtered_links)
+
+        # Display results
         st.subheader("Included Links (Prioritized)")
         st.write(filtered_links["included"])
 
-        # Display filtered (remaining) links
         st.subheader("Filtered Links (Remaining)")
         st.write(filtered_links["filtered"])
 else:
