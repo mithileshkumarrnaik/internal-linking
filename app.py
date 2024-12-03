@@ -4,6 +4,17 @@ from helpers.nltk_setup import ensure_nltk_data
 from helpers.process import filter_pages, generate_keywords, suggest_internal_links
 from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
 
+EXCLUSION_FILE = "exclusion_list.txt"
+INCLUSION_FILE = "inclusion_list.txt"
+# Load lists
+try:
+    exclusion_list = load_list(EXCLUSION_FILE)
+    inclusion_list = load_list(INCLUSION_FILE)
+except FileNotFoundError as e:
+    st.error(f"Error loading lists: {e}")
+    exclusion_list = []
+    inclusion_list = []
+
 # Ensure NLTK resources are available
 ensure_nltk_data()
 
@@ -72,3 +83,24 @@ if "scraped_data" in st.session_state:
             st.warning("No relevant links found!")
 else:
     st.warning("Please generate keywords first!")
+
+st.header("Step 5: Filter External Links")
+
+if "scraped_data" in st.session_state:
+    # Extract all URLs from the scraped data
+    all_links = st.session_state['scraped_data']['url'].tolist()
+
+    if st.button("Filter External Links"):
+        # Filter the links based on exclusion and inclusion lists
+        filtered_links = filter_external_links(all_links, exclusion_list, inclusion_list)
+
+        # Display included links
+        st.subheader("Included Links (Prioritized)")
+        st.write(filtered_links["included"])
+
+        # Display filtered (remaining) links
+        st.subheader("Filtered Links (Remaining)")
+        st.write(filtered_links["filtered"])
+else:
+    st.warning("No data available. Please scrape blogs first!")
+
