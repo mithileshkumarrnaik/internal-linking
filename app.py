@@ -3,6 +3,7 @@ import pandas as pd
 from helpers.nltk_setup import ensure_nltk_data
 from helpers.process import filter_pages, generate_keywords, suggest_internal_links
 from helpers.scrape import fetch_sitemap_urls, scrape_blog_data
+from helpers.process import load_list
 
 EXCLUSION_FILE = "exclusion_list.txt"
 INCLUSION_FILE = "inclusion_list.txt"
