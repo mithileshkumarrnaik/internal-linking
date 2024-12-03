@@ -1,5 +1,7 @@
 import nltk
 import os
+nltk.download('stopwords')
+nltk.download('punkt')
 
 def setup_nltk_data():
     """
