@@ -1,15 +1,17 @@
 import nltk
 import os
 
-def ensure_nltk_data():
-    nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
-    nltk.data.path.append(nltk_data_path)
+def setup_nltk_data():
+    """
+    Ensures that required NLTK data is downloaded and available.
+    """
+    nltk_data_path = os.getenv("NLTK_DATA", "/home/adminuser/venv/nltk_data")
+    nltk.data.path.append(nltk_data_path)  # Add the custom path for NLTK data
 
-    try:
-        nltk.data.find("tokenizers/punkt")
-    except LookupError:
-        nltk.download("punkt", download_dir=nltk_data_path)
-    try:
-        nltk.data.find("corpora/stopwords")
-    except LookupError:
-        nltk.download("stopwords", download_dir=nltk_data_path)
+    required_resources = ["stopwords", "punkt"]
+    for resource in required_resources:
+        try:
+            nltk.data.find(f"corpora/{resource}")
+        except LookupError:
+            print(f"Downloading missing NLTK resource: {resource}")
+            nltk.download(resource, download_dir=nltk_data_path)
