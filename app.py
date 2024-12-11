@@ -38,49 +38,27 @@ if "scraped_data" not in st.session_state:
 if "new_blog_content" not in st.session_state:
     st.session_state["new_blog_content"] = ""
 
-# Step 1: Select Sitemaps
-st.title("Content Scraper and Link Suggester")
-st.header("Step 1: Select Sitemaps")
-
-selected_sitemaps = st.multiselect(
-    "Select one or more sitemaps to process:",
-    SITEMAP_LINKS,
-    default=SITEMAP_LINKS[:1],  # Preselect the first sitemap
-)
-
+# Step 1: Scrape URLs
 if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
     else:
-        # Scrape URLs from the selected sitemaps
         all_urls = fetch_sitemap_urls(selected_sitemaps)
 
         if not all_urls:
             st.error("No URLs extracted. Check sitemap format.")
         else:
-            # Scrape content and extract keywords
-            scraped_data = scrape_blog_data(all_urls)
-            scraped_df = pd.DataFrame(scraped_data)
-            scraped_df["keywords"] = scraped_df["content"].apply(extract_keywords_with_rake)
-
-            # Filter based on inclusion and exclusion lists
-            filtered_links = filter_external_links(scraped_df["url"].tolist(), exclusion_list, inclusion_list)
-            included_links = filtered_links["included"]
-            excluded_links = filtered_links["excluded"]
-            remaining_links = filtered_links["filtered"]
-
-            # Display processed data
-            st.subheader("Scraped Data with Keywords")
-            st.dataframe(scraped_df)
+            # Filter URLs using exclusion and inclusion lists
+            filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
 
             st.subheader("URL Processing Summary")
-            st.write(f"**Total URLs Scraped:** {len(all_urls)}")
-            st.write(f"**Excluded URLs:** {len(excluded_links)}")
-            st.write(f"**Included URLs:** {len(included_links)}")
-            st.write(f"**Remaining URLs:** {len(remaining_links)}")
+            st.write(f"**Excluded URLs:** {len(filtered_links['excluded'])}")
+            st.write(f"**Included URLs:** {len(filtered_links['included'])}")
+            st.write(f"**Remaining URLs:** {len(filtered_links['filtered'])}")
 
-            # Save data to session state
-            st.session_state["scraped_data"] = scraped_df
+            st.write("Excluded URLs:")
+            st.write(filtered_links['excluded'])
+
 
 # Step 2: Enter New Blog Content
 st.header("Step 2: Enter New Blog Content")
@@ -106,3 +84,7 @@ if new_blog_content:
             st.warning("No relevant URLs found.")
     else:
         st.warning("Please scrape URLs first in Step 1.")
+        
+# Debug: Print exclusion list and URLs
+st.write("Exclusion List:", exclusion_list)
+st.write("All URLs:", urls)
