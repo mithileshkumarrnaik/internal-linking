@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from helpers.nltk_setup import setup_nltk_data
+
 # Ensure NLTK resources are available
 setup_nltk_data()
 
@@ -11,7 +12,6 @@ from helpers.process import (
     extract_keywords_with_rake,
     suggest_internal_links,
 )
-
 
 # Define paths for inclusion and exclusion lists
 EXCLUSION_FILE = "exclusion_list.txt"
@@ -43,14 +43,14 @@ selected_sitemaps = st.multiselect(
     default=SITEMAP_LINKS[:1],  # Optionally preselect the first sitemap
 )
 
-# Step 2: Scrape URLs and Filter
+# Step 2: Scrape and Process URLs
 if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
     else:
         # Scrape URLs from the selected sitemaps
         all_urls = fetch_sitemap_urls(selected_sitemaps)
-        
+
         if not all_urls:
             st.error("No URLs extracted. Check sitemap format.")
         else:
@@ -58,7 +58,7 @@ if st.button("Scrape and Process URLs"):
             scraped_data = scrape_blog_data(all_urls)
             scraped_df = pd.DataFrame(scraped_data)
             scraped_df["keywords"] = scraped_df["content"].apply(extract_keywords_with_rake)
-            
+
             # Filter based on inclusion and exclusion lists
             filtered_links = filter_external_links(scraped_df["url"].tolist(), exclusion_list, inclusion_list)
             included_links = filtered_links["included"]
@@ -82,13 +82,13 @@ if st.button("Scrape and Process URLs"):
 st.header("Step 2: Enter New Blog Content")
 new_blog_content = st.text_area("Paste the new blog content here.")
 
-# Step 4: Suggest URLs
+# Step 4: Suggest Relevant URLs
 if new_blog_content:
     st.header("Step 3: Suggest Relevant URLs")
     if "scraped_data" in st.session_state:
         scraped_df = st.session_state["scraped_data"]
         suggestions = suggest_internal_links(new_blog_content, scraped_df)
-        
+
         if not suggestions.empty:
             st.write("Suggested URLs Based on Keywords")
             st.dataframe(suggestions)
