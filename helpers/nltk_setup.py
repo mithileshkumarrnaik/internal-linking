@@ -1,7 +1,12 @@
 import nltk
 import os
 nltk.download('punkt_tab')
+
 def setup_nltk_data():
+    try:
+        nltk.data.find("tokenizers/punkt")
+    except LookupError:
+        nltk.download("punkt")
     """
     Ensures that required NLTK data is downloaded and available.
     """
