@@ -39,6 +39,16 @@ if "new_blog_content" not in st.session_state:
     st.session_state["new_blog_content"] = ""
 
 # Step 1: Scrape URLs
+st.title("Content Scraper and Link Suggester")
+st.header("Step 1: Select Sitemaps")
+
+# Ensure selected_sitemaps is defined
+selected_sitemaps = st.multiselect(
+    "Select one or more sitemaps to process:",
+    SITEMAP_LINKS,
+    default=SITEMAP_LINKS[:1],  # Preselect the first sitemap
+)
+
 if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
