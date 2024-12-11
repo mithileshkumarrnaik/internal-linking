@@ -82,39 +82,23 @@ if st.button("Scrape and Process URLs"):
             # Save data to session state
             st.session_state["scraped_data"] = scraped_df
 
-# Step 2: Scrape and Process URLs
-if st.button("Scrape and Process URLs", key="scrape_button"):
-    if not selected_sitemaps:
-        st.error("Please select at least one sitemap to process.")
-    else:
-        # Scrape URLs from the selected sitemaps
-        all_urls = fetch_sitemap_urls(selected_sitemaps)
-        total_urls = len(all_urls)
+# Step 2: Enter New Blog Content
+st.header("Step 2: Enter New Blog Content")
+new_blog_content = st.text_area(
+    "Paste the new blog content here.",
+    value=st.session_state.get("new_blog_content", ""),  # Use session state if content exists
+    key="new_blog_content_area"
+)
 
-        if not all_urls:
-            st.error("No URLs extracted. Check sitemap format.")
-        else:
-            # Use progress helper to scrape content
-            def process_url(idx):
-                url = all_urls[idx]
-                return scrape_blog_data([url])  # Scrape one page at a time
-
-            scraped_data = show_progress(total_urls, process_url)
-            scraped_df = pd.DataFrame(sum(scraped_data, []))  # Flatten the results
-            scraped_df["keywords"] = scraped_df["content"].apply(extract_keywords_with_rake)
-
-            # Display results
-            st.subheader("Scraped Data with Keywords")
-            st.dataframe(scraped_df)
+# Save to session state
+if new_blog_content:
+    st.session_state["new_blog_content"] = new_blog_content
 
 # Step 3: Suggest Relevant URLs
-if st.session_state["new_blog_content"]:
+if new_blog_content:
     st.header("Step 3: Suggest Relevant URLs")
     if st.session_state["scraped_data"] is not None:
-        suggestions = suggest_internal_links(
-            st.session_state["new_blog_content"], st.session_state["scraped_data"]
-        )
-
+        suggestions = suggest_internal_links(new_blog_content, st.session_state["scraped_data"])
         if not suggestions.empty:
             st.write("Suggested URLs Based on Keywords")
             st.dataframe(suggestions)
@@ -122,5 +106,3 @@ if st.session_state["new_blog_content"]:
             st.warning("No relevant URLs found.")
     else:
         st.warning("Please scrape URLs first in Step 1.")
-else:
-    st.warning("Paste new blog content in Step 2 to see suggestions.")
