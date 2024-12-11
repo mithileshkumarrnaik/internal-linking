@@ -1,6 +1,6 @@
 import nltk
 import os
-
+nltk.download('punkt_tab')
 def setup_nltk_data():
     """
     Ensures that required NLTK data is downloaded and available.
