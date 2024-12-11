@@ -90,7 +90,4 @@ if new_blog_content:
             st.warning("No relevant URLs found.")
     else:
         st.warning("Please scrape URLs first in Step 1.")
-        
-# Debug: Print exclusion list and URLs
-st.write("Exclusion List:", exclusion_list)
-st.write("All URLs:", urls)
+
