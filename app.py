@@ -58,10 +58,6 @@ if st.button("Scrape and Process URLs"):
 
         if not all_urls:
             st.error("No URLs extracted. Check sitemap format.")
-        else:
-            # Debug: Print exclusion list and scraped URLs
-            st.write("Exclusion List:", exclusion_list)
-            st.write("All Scraped URLs:", all_urls)
 
             # Filter URLs using exclusion and inclusion lists
             filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
