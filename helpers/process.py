@@ -26,23 +26,31 @@ def extract_keywords_with_rake(text, num_keywords=10):
     return ", ".join(rake.get_ranked_phrases()[:num_keywords])
 
 
-def filter_external_links(links, exclusion_list, inclusion_list=None):
+def filter_external_links(urls, exclusion_list, inclusion_list):
     """
-    Filters links based on exclusion and inclusion lists.
+    Filters URLs based on exclusion and inclusion lists.
+
+    Args:
+        urls (list): List of scraped URLs.
+        exclusion_list (list): URLs to exclude.
+        inclusion_list (list): URLs to always include.
+
+    Returns:
+        dict: Filtered results including 'excluded', 'included', and 'filtered' URLs.
     """
-    included = []
     excluded = []
+    included = []
     filtered = []
 
-    for link in links:
-        if any(excl in link for excl in exclusion_list):
-            excluded.append(link)
-        elif inclusion_list and any(incl in link for incl in inclusion_list):
-            included.append(link)
+    for url in urls:
+        if url in exclusion_list:
+            excluded.append(url)
+        elif url in inclusion_list:
+            included.append(url)
         else:
-            filtered.append(link)
+            filtered.append(url)
 
-    return {"included": included, "excluded": excluded, "filtered": filtered}
+    return {"excluded": excluded, "included": included, "filtered": filtered}
 
 
 def preprocess_text(text):
