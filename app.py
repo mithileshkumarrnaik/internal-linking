@@ -43,22 +43,28 @@ if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
     else:
+        # Scrape URLs from the selected sitemaps
         all_urls = fetch_sitemap_urls(selected_sitemaps)
 
         if not all_urls:
             st.error("No URLs extracted. Check sitemap format.")
         else:
+            # Debug: Print exclusion list and scraped URLs
+            st.write("Exclusion List:", exclusion_list)
+            st.write("All Scraped URLs:", all_urls)
+
             # Filter URLs using exclusion and inclusion lists
             filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
 
+            # Debug: Verify the filtered results
+            st.write("Excluded URLs:", filtered_links["excluded"])
+            st.write("Remaining URLs:", filtered_links["filtered"])
+
+            # Display URL processing summary
             st.subheader("URL Processing Summary")
             st.write(f"**Excluded URLs:** {len(filtered_links['excluded'])}")
             st.write(f"**Included URLs:** {len(filtered_links['included'])}")
             st.write(f"**Remaining URLs:** {len(filtered_links['filtered'])}")
-
-            st.write("Excluded URLs:")
-            st.write(filtered_links['excluded'])
-
 
 # Step 2: Enter New Blog Content
 st.header("Step 2: Enter New Blog Content")
