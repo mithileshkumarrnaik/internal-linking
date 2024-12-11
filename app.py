@@ -13,7 +13,6 @@ from helpers.process import (
     extract_keywords_with_rake,
     suggest_internal_links,
 )
-
 # Define paths for inclusion and exclusion lists
 EXCLUSION_FILE = "exclusion_list.txt"
 INCLUSION_FILE = "inclusion_list.txt"
@@ -24,7 +23,6 @@ SITEMAP_LINKS = [
     "https://blog.acviss.com/sitemap-post.xml",
     "https://blog.acviss.com/sitemap-home.xml",
 ]
-
 # Load inclusion and exclusion lists
 try:
     exclusion_list = load_list(EXCLUSION_FILE)
@@ -85,7 +83,7 @@ if st.button("Scrape and Process URLs"):
             st.session_state["scraped_data"] = scraped_df
 
 # Step 2: Scrape and Process URLs
-if st.button("Scrape and Process URLs"):
+if st.button("Scrape and Process URLs", key="scrape_button"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
     else:
