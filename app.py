@@ -33,17 +33,22 @@ except FileNotFoundError as e:
     exclusion_list = []
     inclusion_list = []
 
+# Add a session state to track progress
+if "scraped_data" not in st.session_state:
+    st.session_state["scraped_data"] = None
+if "new_blog_content" not in st.session_state:
+    st.session_state["new_blog_content"] = ""
+
 # Step 1: Select Sitemaps
 st.title("Content Scraper and Link Suggester")
-
 st.header("Step 1: Select Sitemaps")
+
 selected_sitemaps = st.multiselect(
     "Select one or more sitemaps to process:",
     SITEMAP_LINKS,
-    default=SITEMAP_LINKS[:1],  # Optionally preselect the first sitemap
+    default=SITEMAP_LINKS[:1],  # Preselect the first sitemap
 )
 
-# Step 2: Scrape and Process URLs
 if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
@@ -75,19 +80,24 @@ if st.button("Scrape and Process URLs"):
             st.write(f"**Included URLs:** {len(included_links)}")
             st.write(f"**Remaining URLs:** {len(remaining_links)}")
 
-            # Store processed data in session state
+            # Save data to session state
             st.session_state["scraped_data"] = scraped_df
 
-# Step 3: Enter New Blog Content
+# Step 2: Enter New Blog Content
 st.header("Step 2: Enter New Blog Content")
-new_blog_content = st.text_area("Paste the new blog content here.")
-
-# Step 4: Suggest Relevant URLs
+new_blog_content = st.text_area(
+    "Paste the new blog content here.", st.session_state["new_blog_content"]
+)
 if new_blog_content:
+    st.session_state["new_blog_content"] = new_blog_content
+
+# Step 3: Suggest Relevant URLs
+if st.session_state["new_blog_content"]:
     st.header("Step 3: Suggest Relevant URLs")
-    if "scraped_data" in st.session_state:
-        scraped_df = st.session_state["scraped_data"]
-        suggestions = suggest_internal_links(new_blog_content, scraped_df)
+    if st.session_state["scraped_data"] is not None:
+        suggestions = suggest_internal_links(
+            st.session_state["new_blog_content"], st.session_state["scraped_data"]
+        )
 
         if not suggestions.empty:
             st.write("Suggested URLs Based on Keywords")
@@ -96,3 +106,5 @@ if new_blog_content:
             st.warning("No relevant URLs found.")
     else:
         st.warning("Please scrape URLs first in Step 1.")
+else:
+    st.warning("Paste new blog content in Step 2 to see suggestions.")
