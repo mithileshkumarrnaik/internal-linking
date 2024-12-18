@@ -2,7 +2,7 @@ https://blog.acviss.com/posts/10
 https://blog.acviss.com/posts/11
 https://blog.acviss.com/posts/12
 https://blog.acviss.com/posts/13
-https://blog.acvixss.com/posts/14
+https://blog.acviss.com/posts/14
 https://blog.acviss.com/posts/15
 https://blog.acviss.com/posts/16
 https://blog.acviss.com/posts/17
@@ -22,3 +22,5 @@ https://blog.acviss.com/posts/6
 https://blog.acviss.com/posts/7
 https://blog.acviss.com/posts/8
 https://blog.acviss.com/posts/9
+https://blog.acviss.com/posts/category/anti-counterfeiting/2
+https://blog.acviss.com/posts/category/counterfeiting/2
