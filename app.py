@@ -65,18 +65,23 @@ if st.button("Scrape and Process URLs"):
             st.write("Filtering URLs...")
             filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
 
-            # Save the filtered URLs to session state
-            st.session_state["scraped_data"] = filtered_links["filtered"]
+            # Scrape blog content
+            st.write("Scraping blog content...")
+            blog_data = scrape_blog_data(filtered_links["filtered"])
 
-            # Debug: Verify the filtered results
-            st.write("Excluded URLs:", filtered_links["excluded"])
-            st.write("Remaining URLs:", filtered_links["filtered"])
+            # Convert to DataFrame
+            blog_df = pd.DataFrame(blog_data)
 
-            # Display URL processing summary
-            st.subheader("URL Processing Summary")
-            st.write(f"**Excluded URLs:** {len(filtered_links['excluded'])}")
-            st.write(f"**Included URLs:** {len(filtered_links['included'])}")
-            st.write(f"**Remaining URLs:** {len(filtered_links['filtered'])}")
+            if "title" not in blog_df.columns or "content" not in blog_df.columns:
+                st.error("Scraped data does not have the required structure. Check scrape_blog_data.")
+            else:
+                # Extract keywords for each blog
+                blog_df["keywords"] = blog_df["content"].apply(extract_keywords_with_rake)
+
+                # Save processed blog data to session state
+                st.session_state["scraped_data"] = blog_df
+
+                st.write(f"Successfully processed {len(blog_df)} blogs.")
 
 # Step 2: Enter New Blog Content
 st.header("Step 2: Enter New Blog Content")
