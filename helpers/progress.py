@@ -1,30 +1,28 @@
-# Add progress tracking in the scraping process
-if st.button("Scrape and Process URLs"):
-    if not selected_sitemaps:
-        st.error("Please select at least one sitemap to process.")
-    else:
-        st.write("Scraping URLs...")
-        
-        # Wrap the URL fetching process in a progress bar
-        def process_item(idx):
-            # Simulate processing each sitemap URL
-            sitemap = selected_sitemaps[idx]
-            return fetch_sitemap_urls([sitemap])
-        
-        scraped_data = show_progress(len(selected_sitemaps), process_item)
-        
-        # Flatten the scraped data (each item in scraped_data is a list)
-        all_urls = [url for sublist in scraped_data for url in sublist]
+import streamlit as st
 
-        if not all_urls:
-            st.error("No URLs extracted. Check sitemap format.")
-        else:
-            # Filter URLs using exclusion and inclusion lists
-            st.write("Filtering URLs...")
-            filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
+def show_progress(total_items, process_item_callback):
+    """
+    Displays a progress bar in Streamlit while processing items.
 
-            # Display URL processing summary
-            st.subheader("URL Processing Summary")
-            st.write(f"**Excluded URLs:** {len(filtered_links['excluded'])}")
-            st.write(f"**Included URLs:** {len(filtered_links['included'])}")
-            st.write(f"**Remaining URLs:** {len(filtered_links['filtered'])}")
+    Args:
+        total_items (int): Total number of items to process.
+        process_item_callback (function): A callback function to process each item.
+                                          It should accept the current index and return a result.
+    Returns:
+        list: Results collected from processing each item.
+    """
+    results = []
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+
+    for idx in range(total_items):
+        result = process_item_callback(idx)
+        results.append(result)
+
+        # Update progress bar and status
+        progress_bar.progress((idx + 1) / total_items)
+        status_text.text(f"Processing {idx + 1}/{total_items} items...")
+
+    # Clear the status text after completion
+    status_text.text("Processing complete!")
+    return results
