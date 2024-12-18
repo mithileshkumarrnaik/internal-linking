@@ -53,14 +53,20 @@ if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
         st.error("Please select at least one sitemap to process.")
     else:
+        st.write("Scraping URLs...")
+
         # Scrape URLs from the selected sitemaps
         all_urls = fetch_sitemap_urls(selected_sitemaps)
 
         if not all_urls:
             st.error("No URLs extracted. Check sitemap format.")
-
+        else:
             # Filter URLs using exclusion and inclusion lists
+            st.write("Filtering URLs...")
             filtered_links = filter_external_links(all_urls, exclusion_list, inclusion_list)
+
+            # Save the filtered URLs to session state
+            st.session_state["scraped_data"] = filtered_links["filtered"]
 
             # Debug: Verify the filtered results
             st.write("Excluded URLs:", filtered_links["excluded"])
