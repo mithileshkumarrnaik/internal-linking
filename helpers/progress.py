@@ -1,5 +1,3 @@
-from helpers.progress import show_progress
-
 # Add progress tracking in the scraping process
 if st.button("Scrape and Process URLs"):
     if not selected_sitemaps:
