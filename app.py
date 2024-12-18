@@ -98,7 +98,7 @@ if new_blog_content:
 # Step 3: Suggest Relevant URLs
 if new_blog_content:
     st.header("Step 3: Suggest Relevant URLs")
-    if st.session_state["scraped_data"] is not None:
+    if st.session_state["scraped_data"] is not None and not st.session_state["scraped_data"].empty:
         suggestions = suggest_internal_links(new_blog_content, st.session_state["scraped_data"])
         if not suggestions.empty:
             st.write("Suggested URLs Based on Keywords")
