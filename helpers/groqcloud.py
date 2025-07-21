@@ -1,21 +1,21 @@
 import os
-from groqcloud import GroqClient
+import openai
 import pandas as pd
+import streamlit as st
 
-# Initialize the GroqCloud client
-def get_groqcloud_client():
-    api_key = os.getenv("GROQCLOUD_API_KEY")  # Secure your API key in environment variables
-    client = GroqClient(api_key=api_key)
-    return client
+# Get OpenAI API key from Streamlit secrets or environment
+api_key = st.secrets["openai"]["api_key"] if "openai" in st.secrets else os.getenv("OPENAI_API_KEY")
+openai.api_key = api_key
 
-# Generate embeddings for blog content using GroqCloud
-def generate_groqcloud_embeddings(blog_df):
-    client = get_groqcloud_client()
-
+def generate_openai_embeddings(blog_df):
     def fetch_embedding(text):
-        response = client.embedding.create(input_text=text)
-        return response["embedding"]  # Adjust based on GroqCloud's API response
-
-    # Generate embeddings for blog content
+        try:
+            response = openai.Embedding.create(
+                input=text,
+                model="text-embedding-ada-002"
+            )
+            return response["data"][0]["embedding"]
+        except Exception as e:
+            return None
     blog_df["embedding"] = blog_df["content"].apply(fetch_embedding)
     return blog_df
